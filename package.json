@@ -15,6 +15,7 @@
     "prism-core": "^2.0.2",
     "prismjs": "^1.29.0",
     "vue": "^3.5.13",
+    "vue-markdown-render": "^2.2.1",
     "vue-prism-editor": "^2.0.0-alpha.2"
   },
   "devDependencies": {

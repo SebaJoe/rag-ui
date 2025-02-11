@@ -1,7 +1,52 @@
 <template>
+  <nav class="navbar sticky-top" style="background-color: white; padding: 0px">
+    <div class="mx-auto" id="navtop">
+      <div class="container">
+        <div class="row flex justify-content-center">
+          <div class="col-3">
 
+          </div>
+          <div class="col-3 logo-style text-center">
+            <img src="../assets/Cosmic-AI.jpg" height="50px">
+          </div>
+          <div class="col-3 text-center dropdown">
+            <h5 class="pad-dropdown">
+              Export
+            </h5>
+            <div class="dropdown-content">
+              <div class="container">
+                <div class="row drop-row">
+                  <div class="col drop-row">
+                    Export to Jupyter Notebook
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
   <div class="container-fluid">
-    <nav class="navbar fixed-bottom" id="bottom-bar">
+    <div class="mx-auto" id="chatcol">
+      <div class="container">
+        <div class="row">
+          <div class="col">
+            <div class="row">
+              <div class="col">
+                <MarkOut />
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <CodeOut />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <nav class="navbar fixed-bottom" id="bottom-bar" style="background-color: white;">
       <div class="mx-auto" id="chatif">
         <div class="container">
           <div class="row">
@@ -40,10 +85,12 @@
 <script>
 
   import CodeOut from './CodeOut.vue';
+  import MarkOut from './MarkOut.vue';
 
   export default {
     components: {
         CodeOut,
+        MarkOut,
     },
     data () {
 
@@ -59,12 +106,31 @@
 <style>
 
 #bottom-bar {
-  height: 30%;
+  height: 250px;
 }
 
 #chatif {
   border-top: #E5E4E2 solid 0.5px;
-  width: 40%;
+  width: 50%;
+  padding-bottom: 150px;
+}
+
+#navtop {
+  border-bottom: #E5E4E2 solid 0.5px;
+  width: 100%;
+}
+
+#chatcol {
+  width: 50%;
+  padding-bottom: 260px;
+}
+
+.logo-style {
+  padding: 10px;
+}
+
+.pad-dropdown {
+  padding: 20px;
 }
 
 #chatbox {
@@ -80,9 +146,34 @@
 
     resize: none; /*remove the resize handle on the bottom right*/
 
-    height: 150px;
+    height: 130px;
 
-    width: 40%;
+    width: 100%;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  z-index: 100;
+  width: 100%;
+  cursor: pointer;
+}
+
+.drop-row {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  background-color: #E5E4E2;
+}
+
+.dropdown:hover .dropdown-content {
+  background-color: #E5E4E2;
+  display: block;
 }
 
 #enter-button {
