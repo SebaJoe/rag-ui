@@ -1,6 +1,6 @@
 
 <template>
-    <vue-markdown :source="md_text" :options="md_options"/>
+    <vue-markdown :source="text" :options="md_options"/>
 </template>
 
 
@@ -13,6 +13,7 @@
             VueMarkdown
         },
         props: {
+            text: {required: true, type: String},
         },
         data () {
             var defaults = {
@@ -23,7 +24,6 @@
 
                 return {
                     md_options: defaults,
-                    md_text: "# Hello World!",
                 }
         },
         methods: {

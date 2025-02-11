@@ -34,7 +34,9 @@
           <div class="col">
             <div class="row">
               <div class="col">
-                <MarkOut />
+                <MarkOut
+                  v-model:text="stream_out" 
+                />
               </div>
             </div>
             <div class="row">
@@ -51,7 +53,7 @@
         <div class="container">
           <div class="row">
             <div class="col"> 
-              <textarea id="chatbox" placeholder="Write your queries here..."></textarea>
+              <textarea id="chatbox" v-model="query" placeholder="Write your queries here..."></textarea>
             </div>
           </div>
           <div class="row">
@@ -69,7 +71,7 @@
               </div>
             </div>
             <div class="col-1">
-              <button type="button" id="enter-button" class="btn btn-dark">
+              <button type="button" id="enter-button" class="btn btn-dark" @click="send_response()">
                 <i class="bi bi-arrow-return-right"></i>
               </button>
             </div>
@@ -84,6 +86,8 @@
 
 <script>
 
+  import axios from 'axios'
+
   import CodeOut from './CodeOut.vue';
   import MarkOut from './MarkOut.vue';
 
@@ -93,10 +97,56 @@
         MarkOut,
     },
     data () {
-
+      return {
+        stream_out: "",
+        query: "",
+      }
     },
     methods: {
+      send_response() {
+        let prompt = this.query;
+        
 
+        let prompt_wrapped = {
+          messages: [
+            {'role': 'user', 'content': prompt},
+          ],
+        }
+
+        console.log(prompt_wrapped);
+
+      axios.post("http://127.0.0.1:5000/stream", prompt_wrapped)
+        .then(response => {
+
+          console.log(response);
+
+          console.log("What's crackign");
+
+          const eventSource = new EventSource("http://127.0.0.1:5000/stream");
+
+          eventSource.onerror = (e) => console.log("Error:", e);
+
+
+          eventSource.onmessage = (e) => {
+            if (e.data !== "[DONE]") {
+              console.log(JSON.stringify(e.data));
+              let stext = e.data.replaceAll("<NEWLINE>", '\n');
+              // if (!stext.endsWith(" ")) {
+              //   stext += " ";
+              // }
+              this.stream_out += stext;
+            } else {
+              console.log("Connection closed")
+              eventSource.close()
+            }
+          };
+
+        }) 
+        .catch(error => {
+          console.error("There was an error!", error);
+          
+        });
+      },
     }
   }
 
