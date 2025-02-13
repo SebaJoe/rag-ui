@@ -111,6 +111,7 @@
   import download from "downloadjs";
   import { parse } from 'vue/compiler-sfc';
 
+
   export default {
     components: {
         CodeOut,
@@ -164,6 +165,8 @@
       //     }
       // }
 
+      window.addEventListener('beforeunload', this.handle_death);
+
     },
     methods: {
       replace_code_w_cells() {
@@ -196,6 +199,17 @@
               msg_ind: ind_preserve,
             });
           } 
+        }
+      },
+      async handle_death(event) {
+
+        event.preventDefault();
+
+        console.log("This is reached");
+        alert("time to go");
+        if (this.kernel) {
+          let void_var = await KernelAPI.shutdownKernel(this.kernel.model.id, this.kernel.settings);
+          console.log(void_var);
         }
       },
       click_file () {
