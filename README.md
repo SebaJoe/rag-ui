@@ -33,3 +33,9 @@ npm run build
 ```sh
 npm run lint
 ```
+
+## Command for JNB
+
+```sh
+jupyter notebook --NotebookApp.allow_remote_access=True --NotebookApp.allow_origin='*' --NotebookApp.token=''  --NotebookApp.disable_check_xsrf=True
+```
