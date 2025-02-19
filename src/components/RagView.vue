@@ -16,20 +16,20 @@
         <div class="row">
           <div class="col">
             <div class="row" v-for="(cell, index) in out_cells" :key="index">
-              <div class="col" v-if="cell.type === 'code_response'">
+              <div class="col mt-2" v-if="cell.type === 'code_response'">
                 <CodeOut 
                   v-model:code="cell.text"
                   v-model:output="cell.output"
                   :kernel="kernel"
                 />
               </div>
-              <div class="col" v-else-if="cell.type === 'text_response'">
+              <div class="col mt-2" v-else-if="cell.type === 'text_response'">
                 <MarkOut 
                   v-model:text="cell.text"
                   :start_edit="edit_snap()"
                 />
               </div>
-              <div class="col" v-else>
+              <div class="col mt-2" v-else>
                 <MarkOut 
                   v-model:text="cell.text"
                   isUser
@@ -495,6 +495,10 @@ code[class*="language-"] {
 .hover-btn:hover {
   cursor: pointer;
   background-color: #F9f9f9;
+}
+
+.hover-btn > h5 {
+  margin: 0px;
 }
 
 #chatbox {

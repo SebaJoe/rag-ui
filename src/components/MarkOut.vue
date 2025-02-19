@@ -134,8 +134,8 @@
 
 .options-bar {
     position: absolute;
-    width: 30px;
-    left: 74%;
+    width: 50px;
+    left: 73.5%;
 }
 
 .clickable {

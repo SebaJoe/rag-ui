@@ -19,11 +19,20 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row flex justify-content-center mt-4 mb-3" v-if="output_error">
+                        <div class="col text-center">
+                            <h5><b><i class="bi bi-x-lg text-danger"></i></b></h5>
+                        </div>
+                    </div>
+                    <div class="row flex justify-content-center mt-4 mb-3" v-else-if="code_success">
+                        <div class="col text-center">
+                            <h5><b><i class="bi bi-check-lg text-success"></i></b></h5>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="row" v-if="has_output">
-                <div class="col output-div output-class">
-                    <p>{{ output }}</p>
+                <div class="col output-div output-class" v-html="output">
                 </div>
             </div>
         </div>
@@ -43,6 +52,8 @@
     import 'prismjs/themes/prism-tomorrow.css'; // import syntax highlighting styles
 
     import { KernelConnection } from "@jupyterlab/services";
+    //import AnsiUp from 'ansi-up';
+    import { AnsiUp } from 'ansi-up';
 
     export default {
 
@@ -59,6 +70,8 @@
                 temp_code: this.code,
                 has_output: false,
                 loading: false,
+                output_error: false,
+                code_success: false,
             }
         },
         methods: {
@@ -78,6 +91,10 @@
                     return;
                 }
 
+                this.$emit('update:output', "");
+                this.output_error = false;
+                this.code_success = false;
+
                 let connection = new KernelConnection({ model: this.kernel.model, serverSettings:this.kernel.settings, })
 
                 console.log(KernelConnection);
@@ -87,12 +104,63 @@
                 this.loading = true;
                 console.log(future);
 
+                const ansiUp = new AnsiUp();
+
                 future.onIOPub = msg => {
                     this.loading = false;
                     if (msg.header.msg_type === 'stream') {
                         this.has_output = true;
                         //this.output = msg.content.text;
-                        this.$emit('update:output', msg.content.text);
+                        this.$emit('update:output', ansiUp.ansi_to_html(this.output + "\n" + msg.content.text));
+                        this.code_success = true;
+                    } else if (msg.header.msg_type === 'error') {
+                        this.has_output = true;
+                        console.log(msg.content);
+
+                        let new_output = "";
+                        for (let i = msg.content.traceback.length - 1; i >= 0; i--) {
+                            new_output += msg.content.traceback[msg.content.traceback.length - 1 - i] + '\n';
+                        }
+                        this.$emit('update:output', ansiUp.ansi_to_html(this.output + "\n" + new_output));
+                        this.output_error = true;
+                    } else if (msg.header.msg_type === 'display_data') {
+                        this.has_output = true;
+                        let new_output = "";
+                        console.log(msg.content);
+
+                        // for (const key in msg.content.data) {
+                        //     console.log(key);
+                        //     if (myObject.hasOwnProperty(key)) {
+                        //         console.log(key);
+                        //         let value = msg.content.data[key];
+                        //         if (key.includes('image')) {
+                        //             console.log("What's up?");
+                        //             let image_tag = `<img src="data:${key};base64,${value}" style="object-fit:contain;"/>`
+                        //             this.$emit('update:output', ansiUp.ansi_to_html(this.output + "\n" + image_tag));
+                        //         } else if (key.includes('text')) {
+
+                        //         } else if (key.includes('json')) {
+
+                        //         }
+                        //     }
+                        // }
+
+                        Object.entries(msg.content.data).forEach(([key, value]) => {
+                            console.log([key, value]);
+                            if (key.includes('image')) {
+                                console.log("What's up?");
+                                let image_tag = `<img src="data:${key};base64,${value}" alt="${key}" style="object-fit:contain;">`
+                                //let image_tag = '<img src="data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==" alt="Red dot" />';
+                                this.$emit('update:output', this.output + "\n" + image_tag);
+                            } else if (key.includes('text')) {
+
+                            } else if (key.includes('json')) {
+
+                            }
+                        });
+                        this.code_success = true;
+                    } else if (msg.header.msg_type === 'execute_result') {
+                        console.log(msg.content);
                     }
                 }
             }
@@ -147,6 +215,8 @@
     .output-div {
         background-color: black;
         padding: 20px;
+        max-height: 500px;
+        overflow: auto;
     }
 
 </style>
